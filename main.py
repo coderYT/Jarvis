@@ -1,35 +1,33 @@
-import pyttsx3
-import speech_recognition as sr
+import json
+import logging
+import platform
+import sys
 
-speech = sr.Recognizer()
+from PyQt5.QtWidgets import QApplication
 
-try:
-    engine = pyttsx3.init()
-except Exception as e:
-    print(e)
-
-
-def speak(text):
-    engine.say(text)
-    engine.runAndWait()
+from assistant.gui import GUI
+from assistant.jarvis import Jarvis
 
 
-def read_voice_cmd():
-    print('Speak...')
-    with sr.Microphone() as source:
-        audio = speech.listen(source)
-    try:
-        return speech.recognize_google(audio_data=audio).lower()
-    except Exception as e:
-        print(e)
+def read_json():
+    logging.info('Reading configuration data.')
+    # Reading data file
+    with open('config/config.json') as file:
+        return json.load(file)
 
 
-while True:
-    voice_input = read_voice_cmd()
-    print('Voice Input : ', voice_input)
-    if 'jarvis' in voice_input:
-        speak('Hello Sir, How may i help you?')
-        continue
-    else:
-        speak('Command not found.')
-        continue
+if __name__ == '__main__':
+    operating_system = platform.uname().system
+    logging.basicConfig(level=logging.INFO,
+                        format='%(asctime)s %(levelname)s:%(message)s',
+                        datefmt='%Y-%m-%d %H:%M:%S')
+
+    jarvis = Jarvis(logger=logging, config=read_json(), os_name=operating_system)
+
+    app = QApplication(sys.argv)
+    gui = GUI()
+
+    jarvis.start()
+    gui.start()
+
+    app.exit(app.exec_())

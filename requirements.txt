@@ -1,3 +1,6 @@
-pyttsx3
 SpeechRecognition
 PyAudio
+itunes~=2019.4.13
+pyttsx3~=2.87
+pyglet
+PyQt5~=5.14.2
